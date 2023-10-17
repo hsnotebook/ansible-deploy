@@ -1,0 +1,6 @@
+---
+- name: restart postgresql
+  systemd:
+    name: postgresql-15
+    state: restarted
+    daemon_reload: yes

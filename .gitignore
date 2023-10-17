@@ -1,0 +1,7 @@
+*.tar.gz
+*.zip
+*.tgz
+repos/**
+!repos/download.sh
+**/files/*
+!**/files/collect-files.sh

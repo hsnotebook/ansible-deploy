@@ -1,0 +1,49 @@
+- name: install docker compose
+  yum:
+    name: docker-compose-plugin
+    state: installed
+
+- name: create home dir
+  file:
+    path: '{{ superset.home_dir }}'
+    state: directory
+
+- name: copy docker utils
+  copy:
+    src: docker/
+    dest: '{{ superset.home_dir }}/docker/'
+    force: false
+
+- name: keep docker utils permission
+  file:
+    path: '{{ superset.home_dir }}/{{ item }}'
+    mode: '0755'
+  loop:
+    - docker/docker-bootstrap.sh
+    - docker/docker-ci.sh
+    - docker/docker-frontend.sh
+    - docker/docker-init.sh
+    - docker/frontend-mem-nag.sh
+    - docker/run-server.sh
+    - docker/docker-entrypoint-initdb.d/examples-init.sh
+
+- name: copy images
+  copy:
+    src: superset-images.tar.gz
+    dest: '{{ superset.home_dir }}/superset-images.tar.gz'
+    force: false
+
+- name: load images
+  shell:
+    chdir: '{{ superset.home_dir }}'
+    cmd: docker load --input superset-images.tar.gz
+
+- name: copy docker compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: '{{ superset.home_dir }}/docker-compose.yml'
+
+- name: start superset
+  shell:
+    chdir: '{{ superset.home_dir }}'
+    cmd: docker compose up -d

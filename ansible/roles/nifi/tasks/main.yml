@@ -1,0 +1,71 @@
+- name: setup maximum number of open file descriptors
+  community.general.pam_limits:
+    domain: root
+    limit_type: '-'
+    limit_item: nofile
+    value: '65535'
+
+- name: setup maximum number of processes
+  community.general.pam_limits:
+    domain: root
+    limit_type: '-'
+    limit_item: nproc
+    value: '65535'
+
+- name: vm.swappiness
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: '0'
+
+# - name: remount the data volume
+#   ansible.posix.mount:
+#     path: '{{ nifi.partition_path }}'
+#     opts: noatime
+#     state: remounted
+
+- name: install jdk11
+  yum:
+    name: java-11-openjdk-devel
+    state: present
+
+- name: copy nifi package
+  unarchive:
+    src: nifi-1.23.2-bin.zip
+    dest: '{{ app_home }}'
+    creates: '{{ nifi.home_dir }}'
+
+- name: copy jdbc drivers
+  copy:
+    src: jdbc/
+    dest: '{{ nifi.home_dir }}/jdbc/'
+    force: false
+
+- name: Copy config files
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ nifi.home_dir }}/conf/{{ item }}'
+  loop:
+    - bootstrap.conf
+    - nifi.properties
+    - logback.xml
+  notify:
+    - Restart nifi
+
+- name: set username and password
+  shell:
+    chdir: '{{ nifi.home_dir }}'
+    cmd: './bin/nifi.sh set-single-user-credentials {{ nifi.username}} {{ nifi.password }}'
+
+- name: Copy systemd service file
+  template:
+    src: nifi.service.j2
+    dest: /usr/lib/systemd/system/nifi.service
+  notify:
+    - Restart nifi
+
+- name: Start services
+  systemd:
+    name: nifi
+    state: started
+    daemon_reload: yes
+    enabled: yes

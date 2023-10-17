@@ -1,0 +1,31 @@
+- name: create data dir
+  file:
+    path: '{{ minio.data_dir }}'
+    state: directory
+
+- name: copy rpm package
+  copy:
+    src: minio.rpm
+    dest: /tmp/minio.rpm
+    force: false
+
+- name: install minio
+  shell:
+    cmd: yum remove -y minio && yum install -y /tmp/minio.rpm
+
+- name: copy minio client
+  copy:
+    src: mc
+    dest: /usr/local/bin/mc
+    force: false
+
+- name: copy service file
+  template:
+    src: minio.service.j2
+    dest: /usr/lib/systemd/system/minio.service
+
+- name: start minio
+  systemd:
+    name: minio
+    state: started
+    enabled: yes

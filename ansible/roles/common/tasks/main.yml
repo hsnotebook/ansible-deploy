@@ -1,0 +1,40 @@
+- name: set hostname
+  hostname:
+    name: '{{ inventory_hostname }}'
+
+- name: stop firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: disable selinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: add repo
+  yum_repository:
+    name: '{{ item }}'
+    description: '{{ item }}'
+    baseurl: 'http://{{ repo.server }}:{{ repo.http_port }}/{{ item }}'
+    enabled: yes
+    gpgcheck: no
+  loop:
+    - common
+    - docker
+    - mysql57
+    - mysql8
+    - postgresql
+
+- name: yum make cache
+  shell: yum makecache
+  args:
+    warn: false
+
+- name: create dir
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    - '{{ app_home }}'
+    - '{{ data_home }}'

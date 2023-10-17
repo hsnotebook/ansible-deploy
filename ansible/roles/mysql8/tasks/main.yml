@@ -1,0 +1,63 @@
+- name: Remove mariadb-libs
+  yum:
+    name: mariadb-libs
+    state: absent
+
+- name: Install mysql 8.0
+  yum:
+    name: mysql-community-server
+    enablerepo: mysql8
+    state: present
+
+- name: Change data dir owner
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: mysql
+    group: mysql
+    recurse: yes
+  loop:
+    - '{{ mysql8.data_dir }}'
+    - '{{ mysql8.tmp_dir }}'
+
+- name: Copy config
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+
+- name: Create init sql file
+  ansible.builtin.copy:
+    content: |
+      alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql8.root_password }}';
+      flush privileges;
+      update mysql.user set host='%' where user='root';
+      flush privileges;
+    dest: /tmp/mysql-init.sql
+
+- name: mysqld Uses init file
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/mysqld.service
+    regexp: '^ExecStart='
+    line:
+      ExecStart=/usr/sbin/mysqld --init-file=/tmp/mysql-init.sql $MYSQLD_OPTS
+
+- name: Restart mysqld
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: mysqld
+    state: restarted
+
+- name: mysqld don't use init file
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/mysqld.service
+    regexp: '^ExecStart='
+    line:
+      ExecStart=/usr/sbin/mysqld $MYSQLD_OPTS
+
+- name: Restart mysqld
+  ansible.builtin.systemd:
+    name: mysqld
+    daemon_reload: yes
+    state: restarted
+    enabled: yes

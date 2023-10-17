@@ -1,0 +1,9 @@
+{
+    "registry-mirrors": ["https://hub-mirror.c.163.com"],
+    "insecure-registries": ["{{ registry.hostname }}:{{ registry.port }}"],
+    "data-root": "{{ docker.data_dir }}",
+    "log-driver": "json-file",
+    "log-opts": { "max-size": "100m", "max-file": "3" },
+    "bip": "172.120.0.1/16"
+}
+

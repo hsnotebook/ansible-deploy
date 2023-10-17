@@ -1,0 +1,33 @@
+- name: install docker
+  yum:
+    name: docker-ce
+    state: installed
+
+- name: install docker compose
+  yum:
+    name: docker-compose-plugin
+    state: installed
+
+- name: create config directory
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: add registry host
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: '{{ registry.ip }} {{ registry.hostname }}'
+
+- name: copy daemon.json
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  notify:
+    - restart docker
+
+- name: start docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+

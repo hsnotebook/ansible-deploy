@@ -1,0 +1,27 @@
+- name: Create Registry Directory
+  file:
+    path: '{{ app_home }}/registry'
+    state: directory
+
+- name: Create Registry Data Directory
+  file:
+    path: '{{ registry.data_dir }}'
+    state: directory
+
+- name: Copy Registry Image
+  copy:
+    src: registry-image.tar.gz
+    dest: '{{ app_home }}/registry/registry-image.tar.gz'
+
+- name: Load Image
+  shell: 'docker load --input {{ app_home }}/registry/registry-image.tar.gz'
+
+- name: Copy Script
+  template:
+    src: startup.sh.j2
+    dest: '{{ app_home }}/registry/startup.sh'
+    mode: 755
+
+- name: Start Registry
+  shell: '{{ app_home }}/registry/startup.sh'
+  ignore_errors: yes

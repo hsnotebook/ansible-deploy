@@ -1,0 +1,7 @@
+---
+- name: debug
+  hosts: all
+  tasks:
+    - name: debug
+      debug:
+        msg:  "{{ lookup('env', 'SYS_CONFIG_DISTRICT_CITY_CODE') }}"

@@ -1,0 +1,61 @@
+- name: Install MySQL 5.7
+  yum:
+    name: mysql-community-server
+    state: installed
+    disablerep: '*'
+    enablerep: mysql57
+
+- name: Change data dir owner
+  file:
+    path: '{{ mysql57.data_dir }}'
+    state: directory
+    owner: mysql
+    group: mysql
+    recurse: yes
+
+
+- name: Copy config
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+
+- name: Create init sql file
+  ansible.builtin.copy:
+    content: |
+      ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql57.root_password }}';
+      GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{{ mysql57.root_password }}';
+      FLUSH PRIVILEGES;
+    dest: /tmp/mysql-init.sql
+
+- name: mysqld Uses init file
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/mysqld.service
+    regexp: '^ExecStart='
+    line:
+      ExecStart=/usr/sbin/mysqld --daemonize
+      --pid-file=/var/run/mysqld/mysqld.pid
+      --init-file=/tmp/mysql-init.sql
+      $MYSQLD_OPTS
+
+- name: Restart mysqld
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: mysqld
+    state: restarted
+
+- name: mysqld don't use init file
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/mysqld.service
+    regexp: '^ExecStart='
+    line:
+      ExecStart=/usr/sbin/mysqld --daemonize
+      --pid-file=/var/run/mysqld/mysqld.pid
+      $MYSQLD_OPTS
+
+- name: Restart mysqld
+  ansible.builtin.systemd:
+    name: mysqld
+    daemon_reload: yes
+    state: restarted
+    enabled: yes

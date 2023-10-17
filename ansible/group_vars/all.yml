@@ -1,0 +1,67 @@
+---
+ip: "{{ lookup('env', 'IP') }}"
+app_home: /opt/lhasa
+data_home: /mnt/data01
+
+repo:
+  server: 172.20.72.29
+  http_port: 30081
+
+registry:
+  ip: 172.20.72.29
+  port: 5000
+  hostname: registry.ctfo.com
+  username: admin
+  password: ctfo@123
+  data_dir: '{{ data_home }}/registry'
+
+docker:
+  data_dir: '{{ data_home }}/docker'
+
+mysql8:
+  data_dir: '{{ data_home }}/mysql8/data'
+  tmp_dir:  '{{ data_home }}/mysql8/tmp'
+  port: 33306
+  root_password: Ctfo@123
+  innodb_buffer_pool_size: 27917287424 # 26G
+
+mysql57:
+  data_dir: '{{ data_home }}/mysql57/data'
+  port: 33206
+  root_password: Ctfo@123
+  innodb_buffer_pool_size: 27917287424 # 26G
+
+postgresql:
+  data_dir: '{{ data_home }}/postgresql'
+  port: 35432
+  max_connections: 1000
+  superuser:
+    name: postgres
+    password: ctfo@123
+
+nifi:
+  home_dir: '{{ app_home }}/nifi-1.23.2'
+  # partition_path: / # 数据文件所在分区
+  username: admin
+  password: admin@123456 # 至少12个字符
+  port: 38443
+  data_dir: '{{ data_home }}/nifi'
+  log_history: 2
+  jvm:
+    xms: 4g
+    xmx: 12g
+
+dolphinscheduler:
+  home_dir: '{{ app_home }}/dolphinscheduler'
+  data_dir: '{{ data_home }}/dolphinscheduler'
+  port: 32345
+
+superset:
+  home_dir: '{{ app_home }}/superset'
+  data_dir: '{{ data_home }}/superset'
+  port: 38088
+
+minio:
+  data_dir: '{{ data_home }}/minio'
+  console_port: 39090
+  api_port: 39000

@@ -1,0 +1,64 @@
+---
+- name: apply common configuration
+  hosts: all
+  roles:
+    - common
+  tags: common
+
+- name: install docker
+  hosts: docker
+  roles:
+    - docker
+  tags: docker
+
+- name: install registry
+  hosts: docker_registry
+  roles:
+    - docker-registry
+  tags: registry
+
+- name: login docker registry
+  hosts: docker
+  tasks:
+    - name: Pause for 5 seconds to wait Registry startup
+      pause:
+        seconds: 5
+    - name: Login Docker Registry
+      shell: docker login -u {{ registry.username }} -p {{ registry.password }} {{ registry.hostname }}:{{ registry.port }}
+  tags: registry
+
+- name: install mysql8
+  hosts: mysql8
+  roles:
+    - mysql8
+  tags: mysql8
+
+- name: install postgresql
+  hosts: postgresql
+  roles:
+    - postgresql
+  tags: postgresql
+
+- name: install dolphinscheduler
+  hosts: dolphinscheduler
+  roles:
+    - dolphinscheduler
+  tags: dolphinscheduler
+
+- name: install superset
+  hosts: superset
+  roles:
+    - superset
+  tags: superset
+
+- name: install nifi
+  hosts: nifi
+  roles:
+    - nifi
+  tags: nifi
+
+- name: install minio
+  hosts: minio
+  roles:
+    - minio
+  tags: minio

@@ -1,0 +1,6 @@
+---
+- name: Restart nifi
+  systemd:
+    name: nifi
+    state: restarted
+    daemon_reload: yes

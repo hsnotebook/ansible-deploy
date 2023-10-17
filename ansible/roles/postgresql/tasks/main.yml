@@ -1,0 +1,64 @@
+- name: install postgresql packages
+  yum:
+    name: '{{ item }}'
+    state: installed
+  loop:
+    - postgresql15-server
+    - postgis33_15
+    - pg_cron_15
+    - pg_partman_15
+
+- name: create password file
+  copy:
+    dest: /tmp/pg-pw.txt
+    content: '{{ postgresql.superuser.password }}'
+
+- name: create data dir
+  file:
+    path: '{{ postgresql.data_dir }}'
+    state: directory
+    owner: postgres
+    group: postgres
+
+- name: init db
+  shell: su postgres -c "/usr/pgsql-15/bin/initdb -U {{ postgresql.superuser.name }} --pwfile /tmp/pg-pw.txt -D {{ postgresql.data_dir }}"
+
+- name: copy config file
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ postgresql.data_dir }}/{{ item }}'
+  loop:
+    - pg_hba.conf
+    - postgresql.conf
+  notify:
+    - restart postgresql
+
+- name: copy service file
+  template:
+    src: postgresql-15.service.j2
+    dest: /usr/lib/systemd/system/postgresql-15.service
+  notify:
+    - restart postgresql
+
+- name: start postgresql
+  systemd:
+    name: postgresql-15
+    state: started
+    enabled: yes
+
+- name: create extension file
+  copy:
+    dest: /tmp/pg-extension.txt
+    content: |
+      CREATE EXTENSION IF NOT EXISTS plpgsql;
+      CREATE EXTENSION postgis;
+      CREATE EXTENSION postgis_raster;
+      CREATE EXTENSION postgis_topology;
+      CREATE EXTENSION pg_cron;
+      CREATE SCHEMA partman;
+      CREATE EXTENSION pg_partman SCHEMA partman;
+
+- name: enable extension
+  shell: psql -h /run/postgresql -p {{ postgresql.port }} -U {{ postgresql.superuser.name }} -f /tmp/pg-extension.txt
+
+

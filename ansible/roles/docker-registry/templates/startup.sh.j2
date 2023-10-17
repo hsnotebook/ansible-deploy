@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ "$(docker ps -a | grep docker-registry)" ];then
+    docker stop docker-registry
+    docker rm docker-registry
+fi
+
+docker run -d \
+	--restart=unless-stopped \
+	--name docker-registry \
+	-p {{ registry.port }}:5000 \
+	-v {{ registry.data_dir }}:/var/lib/registry \
+	registry.ctfo.com:5000/registry:latest

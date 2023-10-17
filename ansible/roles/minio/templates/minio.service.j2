@@ -1,0 +1,12 @@
+[Unit]
+Description=Minio server
+Documentation=https://min.io/docs/minio/linux/index.html
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/minio server {{ minio.data_dir }} --address :{{ minio.api_port }} --console-address :{{ minio.console_port }}
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,17 @@
+[Unit]
+Description=Nifi
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+LimitNOFILE=65535
+LimitNPROC=65535
+ExecStart={{ nifi.home_dir }}/bin/nifi.sh run
+ExecStop={{ nifi.home_dir }}/bin/nifi.sh stop
+
+[Install]
+WantedBy=multi-user.target
+

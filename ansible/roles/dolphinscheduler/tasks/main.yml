@@ -1,0 +1,86 @@
+- name: install docker compose
+  yum:
+    name: docker-compose-plugin
+    state: installed
+
+- name: create home dir
+  file:
+    path: '{{ dolphinscheduler.home_dir }}'
+    state: directory
+
+- name: copy images
+  copy:
+    src: dolphinscheduler-images.tar.gz
+    dest: '{{ dolphinscheduler.home_dir }}/dolphinscheduler-images.tar.gz'
+    force: false
+
+- name: copy datax
+  unarchive:
+    src: datax.tar.gz
+    dest: '{{ dolphinscheduler.home_dir }}'
+    creates: '{{ dolphinscheduler.home_dir }}/datax'
+
+- name: load images
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker load --input dolphinscheduler-images.tar.gz
+
+- name: create data dir
+  file:
+    path: '{{ dolphinscheduler.data_dir }}/{{ item }}'
+    state: directory
+    owner: '1001'
+    group: root
+  loop:
+    - dolphinscheduler-postgresql
+    - dolphinscheduler-zookeeper
+    - dolphinscheduler-worker-data
+    - dolphinscheduler-logs
+    - dolphinscheduler-shared-local
+    - dolphinscheduler-resource-local
+
+- name: copy docker compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: '{{ dolphinscheduler.home_dir }}/docker-compose.yml'
+
+- name: copy docker .env file
+  template:
+    src: env.j2
+    dest: '{{ dolphinscheduler.home_dir }}/.env'
+
+- name: clean init container
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker compose --profile schema down
+
+- name: clean container
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker compose --profile all down
+
+- name: init db
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker compose --profile schema up -d
+
+- name: Pause for 60 seconds to wait init
+  pause:
+    seconds: 60
+
+- name: clean init container
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker compose --profile schema down
+
+- name: start dolphinscheduler
+  shell:
+    chdir: '{{ dolphinscheduler.home_dir }}'
+    cmd: docker compose --profile all up -d
+
+- name: clean task for dolphinscheduler-logs
+  cron:
+    name: clean dolphinscheduler-logs
+    minute: "0"
+    hour: "1"
+    job: "find {{ dolphinscheduler.data_dir }}/dolphinscheduler-logs -type f -mtime +5 -execdir rm -- '{}' \\;"
