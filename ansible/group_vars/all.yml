@@ -70,5 +70,5 @@ redis:
   home_dir: '{{ app_home }}/redis'
   data_dir: '{{ data_home }}/redis'
   password: ctfo@123
-  ip: 0.0.0.0
+  bind_ip: 0.0.0.0
   port: 36379
