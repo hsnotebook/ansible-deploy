@@ -72,3 +72,8 @@ redis:
   password: ctfo@123
   bind_ip: 0.0.0.0
   port: 36379
+
+activemq:
+  home_dir: '{{ app_home }}/activemq'
+  bind_ip: 0.0.0.0
+  password: ctfo@123

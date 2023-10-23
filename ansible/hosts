@@ -29,3 +29,6 @@ lhasa2-tool
 
 [redis]
 lhasa2-tool
+
+[activemq]
+lhasa2-tool

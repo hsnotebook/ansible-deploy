@@ -1,0 +1,14 @@
+[Unit]
+Description=ActiveMQ
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+ExecStart={{ activemq.home_dir }}/apache-activemq-5.18.2/bin/activemq console
+ExecStop={{ activemq.home_dir }}/apache-activemq-5.18.2/bin/activemq stop
+
+[Install]
+WantedBy=multi-user.target
+
+

@@ -68,3 +68,9 @@
   roles:
     - redis
   tags: redis
+
+- name: install activemq
+  hosts: activemq
+  roles:
+    - activemq
+  tags: activemq

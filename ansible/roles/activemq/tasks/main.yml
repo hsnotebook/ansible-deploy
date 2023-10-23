@@ -1,0 +1,34 @@
+- name: install jdk11
+  yum:
+    name: java-11-openjdk-devel
+    state: present
+
+- name: create home dir
+  file:
+    path: '{{ activemq.home_dir }}'
+    state: directory
+
+- name: copy package
+  unarchive:
+    src: apache-activemq-5.18.2-bin.tar.gz
+    dest: '{{ activemq.home_dir }}'
+    creates: false
+
+- name: copy config files
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ activemq.home_dir }}/apache-activemq-5.18.2/conf/{{ item }}'
+  loop:
+    - jetty-realm.properties
+    - jetty.xml
+
+- name: copy service file
+  template:
+    src: activemq.service.j2
+    dest: /usr/lib/systemd/system/activemq.service
+
+- name: start activemq
+  systemd:
+    name: activemq
+    state: started
+    enabled: yes
