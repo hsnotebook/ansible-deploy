@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+script_home=$(cd $(dirname "${0}"); pwd)
+
+main() {
+    if [ "$(docker ps -a | grep ctfo-redis)" ];then
+        docker stop ctfo-redis
+        docker rm ctfo-redis
+    fi
+
+    docker run -d \
+        --restart=unless-stopped \
+        -p {{ redis.port }}:6379 \
+        -v ${script_home}/redis.conf:/usr/local/etc/redis/redis.conf \
+        -v {{ redis.data_dir }}:/data \
+        --name ctfo-redis \
+        registry.ctfo.com:5000/redis:7.2 \
+        redis-server /usr/local/etc/redis/redis.conf
+}
+
+main "${@}"

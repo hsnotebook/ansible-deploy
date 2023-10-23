@@ -65,3 +65,10 @@ minio:
   data_dir: '{{ data_home }}/minio'
   console_port: 39090
   api_port: 39000
+
+redis:
+  home_dir: '{{ app_home }}/redis'
+  data_dir: '{{ data_home }}/redis'
+  password: ctfo@123
+  ip: 0.0.0.0
+  port: 36379

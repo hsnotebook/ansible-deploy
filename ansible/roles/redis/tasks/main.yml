@@ -1,0 +1,31 @@
+- name: create directory
+  file:
+    path: '{{ redis.home_dir }}'
+    state: directory
+
+- name: copy image
+  copy:
+    src: redis.tar.gz
+    dest: '{{ redis.home_dir }}'
+    force: false
+
+- name: load and push image
+  shell:
+    chdir: '{{ redis.home_dir }}'
+    cmd: docker load --input redis.tar.gz && docker push registry.ctfo.com:5000/redis:7.2
+
+- name: copy conf
+  template:
+    src: redis.conf.j2
+    dest: '{{ redis.home_dir }}/redis.conf'
+
+- name: copy shell script
+  template:
+    src: startup-redis.sh.j2
+    dest: '{{ redis.home_dir }}/startup-redis.sh'
+    mode: 755
+
+- name: startup redis
+  shell:
+    chdir: '{{ redis.home_dir }}'
+    cmd: ./startup-redis.sh

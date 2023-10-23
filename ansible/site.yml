@@ -62,3 +62,9 @@
   roles:
     - minio
   tags: minio
+
+- name: install redis
+  hosts: redis
+  roles:
+    - redis
+  tags: redis

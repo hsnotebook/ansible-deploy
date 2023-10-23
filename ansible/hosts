@@ -26,3 +26,6 @@ lhasa2-tool
 
 [minio]
 lhasa2-tool
+
+[redis]
+lhasa2-tool
