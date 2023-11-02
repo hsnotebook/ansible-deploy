@@ -1,0 +1,54 @@
+- name: install pgRouting needed packages
+  yum:
+    name: '{{ item }}'
+    state: installed
+  loop:
+    - bzip2
+    - gcc
+    - gcc-c++
+    - perl-core
+    - llvm-toolset-7-clang
+    - postgresql15-devel
+
+- name: copy cmake
+  unarchive:
+    src: cmake-3.28.0-rc3-linux-x86_64.tar.gz
+    dest: /opt
+    creates: false
+
+- name: copy boost
+  unarchive:
+    src: boost_1_66_0.tar.bz2
+    dest: /usr/src
+    creates: false
+
+- name: copy pgRouting
+  unarchive:
+    src: pgrouting-3.5.1.tar.gz
+    dest: /usr/src
+    creates: false
+
+- name: cmake_policy(SET CMP0074 NEW)
+  ansible.builtin.lineinfile:
+    path: /usr/src/pgrouting-3.5.1/CMakeLists.txt
+    insertafter: '^cmake_minimum_required.*$'
+    line: cmake_policy(SET CMP0074 NEW)
+
+- name: create build dir
+  file:
+    path: /usr/src/pgrouting-3.5.1/build
+    state: directory
+
+- name: build pgRouting
+  shell:
+    chdir: /usr/src/pgrouting-3.5.1/build
+    cmd: export BOOST_ROOT=/usr/src/boost_1_66_0 && export PostgreSQL_ROOT=/usr/pgsql-15 && /opt/cmake-3.28.0-rc3-linux-x86_64/bin/cmake .. && make install
+
+- name: create pgRouting extension file
+  copy:
+    dest: /tmp/pgRouting-extension.txt
+    content: |
+      CREATE EXTENSION pgrouting;
+
+- name: enable pgRouting extension
+  shell: psql -h /run/postgresql -p {{ postgresql.port }} -U {{ postgresql.superuser.name }} -f /tmp/pgRouting-extension.txt

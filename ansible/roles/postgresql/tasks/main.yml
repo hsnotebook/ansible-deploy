@@ -61,4 +61,5 @@
 - name: enable extension
   shell: psql -h /run/postgresql -p {{ postgresql.port }} -U {{ postgresql.superuser.name }} -f /tmp/pg-extension.txt
 
-
+- name: install pgRouting
+  include: pgrouting.yml
