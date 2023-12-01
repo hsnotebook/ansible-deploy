@@ -5,7 +5,7 @@ if [[ "$1" = "bash" ]]
 then
     docker run --rm -it \
         -v $app_home:/repos \
-        repo-creator \
+        repo-creator:anolis \
         bash
     exit 0
 fi
@@ -23,5 +23,5 @@ packages=$@
 docker run --rm \
     -v $app_home:/repos \
     --name repo-creator \
-    repo-creator \
+    repo-creator:anolis \
     $repo_name $packages
