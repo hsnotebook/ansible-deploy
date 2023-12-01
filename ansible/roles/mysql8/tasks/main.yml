@@ -6,6 +6,7 @@
 - name: Install mysql 8.0
   yum:
     name: mysql-community-server
+    disablerepo: '*'
     enablerepo: mysql8
     state: present
 
