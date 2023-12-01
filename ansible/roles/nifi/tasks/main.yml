@@ -30,7 +30,7 @@
 
 - name: copy nifi package
   unarchive:
-    src: nifi-1.23.2-bin.zip
+    src: nifi-1.24.0-bin.zip
     dest: '{{ app_home }}'
     creates: '{{ nifi.home_dir }}'
 

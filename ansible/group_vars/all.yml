@@ -40,7 +40,7 @@ postgresql:
     password: ctfo@123
 
 nifi:
-  home_dir: '{{ app_home }}/nifi-1.23.2'
+  home_dir: '{{ app_home }}/nifi-1.24.0'
   # partition_path: / # 数据文件所在分区
   username: admin
   password: admin@123456 # 至少12个字符

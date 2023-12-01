@@ -5,11 +5,11 @@ echo "Collect nifi package..."
 
 cd ${SCRIPT_HOME}
 
-rm -f ${SCRIPT_HOME}/jdbc
-rm -f ${SCRIPT_HOME}/nifi-1.23.2-bin.zip
+rm -rf ${SCRIPT_HOME}/jdbc
+rm -f ${SCRIPT_HOME}/nifi-1.24.0-bin.zip
 
-echo "    download nifi-1.23.2-bin.zip"
-wget https://dlcdn.apache.org/nifi/1.23.2/nifi-1.23.2-bin.zip
+echo "    download nifi-1.24.0-bin.zip"
+wget https://dlcdn.apache.org/nifi/1.24.0/nifi-1.24.0-bin.zip
 
 echo "    download jdbc drivers"
 mkdir jdbc
