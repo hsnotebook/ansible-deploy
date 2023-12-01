@@ -21,10 +21,21 @@ copy_repo_files() {
     fi
 
     cp -r ${repo_dir}/* ${repo_base_dir}
+    mkdir ${repo_base_dir}/iso
+    mount -o loop,ro ${repo_base_dir}/AnolisOS-7.9-QU1-x86_64-dvd.iso ${repo_base_dir}/iso
+    echo "${repo_base_dir}/AnolisOS-7.9-QU1-x86_64-dvd.iso ${repo_base_dir}/iso iso9660 loop 0 0" >> /etc/fstab
 }
 
 config_local_repo() {
     echo "Create local repo"
+    cat << EOF > /etc/yum.repos.d/iso.repo
+[iso]
+async = 1
+baseurl = file://${repo_base_dir}/iso
+enabled = 1
+gpgcheck = 0
+name = ISO Repo
+EOF
     cat << EOF > /etc/yum.repos.d/common.repo
 [common]
 async = 1
@@ -38,13 +49,12 @@ EOF
 
 install_httpd() {
     echo "Install httpd"
-    yum install -y --disablerepo=* --enablerepo=common httpd > /dev/null
+    yum install -y --disablerepo=* --enablerepo=iso httpd > /dev/null
     sed -i 's/Listen 80/Listen 30081/g' /etc/httpd/conf/httpd.conf
 
     systemctl start httpd > /dev/null
     systemctl enable httpd > /dev/null
     systemctl restart httpd > /dev/null
-
 }
 
 ####################################
@@ -61,6 +71,7 @@ config_repo() {
 clean_repo() {
     echo ""
     echo "########## Clean Repo #############"
+    rm -f /etc/yum.repos.d/iso.repo
     rm -f /etc/yum.repos.d/common.repo
 }
 
@@ -144,7 +155,7 @@ config_selinux() {
 
 case "$1" in
     config)
-        config_selinux
+        # config_selinux
         config_repo
         # config_ssh
         config_ansible

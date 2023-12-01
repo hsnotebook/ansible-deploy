@@ -6,11 +6,15 @@
   systemd:
     name: firewalld
     state: stopped
-    enabled: no
+    enabled: false
 
 - name: disable selinux
   ansible.posix.selinux:
     state: disabled
+
+- name: clean repo
+  shell:
+    cmd: rm -rf /etc/yum.repos.d/*
 
 - name: add repo
   yum_repository:
@@ -20,6 +24,7 @@
     enabled: yes
     gpgcheck: no
   loop:
+    - iso
     - common
     - docker
     - mysql57
