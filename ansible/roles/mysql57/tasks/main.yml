@@ -2,8 +2,8 @@
   yum:
     name: mysql-community-server
     state: installed
-    disablerep: '*'
-    enablerep: mysql57
+    disablerepo: '*'
+    enablerepo: mysql57
 
 - name: Change data dir owner
   file:
