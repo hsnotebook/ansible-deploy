@@ -30,6 +30,7 @@
     - mysql57
     - mysql8
     - postgresql
+    - clang
 
 - name: yum make cache
   shell: yum makecache
