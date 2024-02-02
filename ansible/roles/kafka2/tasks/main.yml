@@ -1,0 +1,50 @@
+- name: Install jdk 1.8
+  yum:
+    name: java-1.8.0-openjdk-devel
+    state: installed
+
+- name: Copy package
+  unarchive:
+    src: kafka_2.12-2.8.2.tgz
+    dest: /opt/
+    creates: '{{ kafka.home }}'
+
+- name: Copy Systemd Service File
+  template:
+    src: '{{ item }}.service.j2'
+    dest: '/usr/lib/systemd/system/{{ item }}.service'
+  loop:
+    - kafka2
+    - kafka2-zookeeper
+
+- name: Create data dir
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    - '{{ kafka.data_dir }}'
+    - '{{ kafka.zk.data_dir }}'
+
+- name: Copy Zookeeper Config File
+  template:
+    src: 'zookeeper.properties.j2'
+    dest: '{{ kafka.home }}/config/zookeeper.properties'
+  notify:
+    - Restart Zookeeper
+
+- name: Copy Kafka Config File
+  template:
+    src: 'server.properties.j2'
+    dest: '{{ kafka.home }}/config/server.properties'
+  notify:
+    - Restart Kafka
+
+- name: Start Service
+  systemd:
+    name: '{{ item }}'
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  loop:
+    - kafka2-zookeeper
+    - kafka2

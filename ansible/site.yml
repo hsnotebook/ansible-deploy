@@ -75,3 +75,9 @@
   roles:
     - activemq
   tags: activemq
+
+- name: install kafka
+  hosts: kafka
+  roles:
+    - kafka2
+  tags: kafka

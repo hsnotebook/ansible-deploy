@@ -1,0 +1,37 @@
+- name: Copy Zookeeper Id File
+  template:
+    src: 'myid.j2'
+    dest: '{{ kafka.zk.data_dir }}/myid'
+  notify:
+    - Restart Zookeeper
+
+- name: Copy Kafka meta.properties
+  template:
+    src: 'meta.properties.j2'
+    dest: '{{ kafka.data_dir }}/meta.properties'
+  notify:
+    - Restart Kafka
+
+- name: Copy Kafka Config File
+  template:
+    src: 'server.properties.j2'
+    dest: '{{ kafka.home }}/config/server.properties'
+  notify:
+    - Restart Kafka
+
+- name: Copy Zookeeper Config File
+  template:
+    src: 'zookeeper.properties.j2'
+    dest: '{{ kafka.home }}/config/zookeeper.properties'
+  notify:
+    - Restart Zookeeper
+
+- name: Start Service
+  systemd:
+    name: '{{ item }}'
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  loop:
+    - kafka2-zookeeper
+    - kafka2
