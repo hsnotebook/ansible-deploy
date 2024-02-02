@@ -11,7 +11,9 @@ docker pull apachesuperset.docker.scarf.sh/apache/superset:3.0.2 > /dev/null
 
 cat << EOF > ${SCRIPT_HOME}/Dockerfile
 FROM apachesuperset.docker.scarf.sh/apache/superset:3.0.2
+USER root
 RUN pip install starrocks cx_Oracle clickhouse-connect impyla trino
+USER superset
 EOF
 
 docker build -t apachesuperset.docker.scarf.sh/apache/superset:3.0.2 -f ${SCRIPT_HOME}/Dockerfile .
