@@ -1,0 +1,30 @@
+- name: setup dns
+  blockinfile:
+    insertafter: EOF
+    dest: /etc/hosts
+    state: present
+    content: '{{ nifi.cluster.dns }}'
+
+- name: Copy config files
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ nifi.home_dir }}/conf/{{ item }}'
+  loop:
+    - nifi.properties
+    - state-management.xml
+    - zookeeper.properties
+
+- name: Create myid directory
+  file:
+    path: '{{ nifi.home_dir }}/state/zookeeper'
+    state: directory
+
+- name: Copy myid
+  template:
+    src: myid.j2
+    dest: '{{ nifi.home_dir }}/state/zookeeper/myid'
+
+- name: Restart nifi
+  systemd:
+    name: nifi
+    state: restarted

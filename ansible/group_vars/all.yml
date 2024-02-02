@@ -50,6 +50,18 @@ nifi:
   jvm:
     xms: 4g
     xmx: 12g
+  cluster:
+    enabled: true
+    protocol_port: 9192
+    ui_autorefresh_interval: 5 sec
+    flow_election_max_wait_time: 1 mins
+    zk:
+      embedded: true
+      port: 12181
+    servers:
+      - dip-collector-01
+      - dip-collector-02
+      - dip-collector-03
 
 dolphinscheduler:
   home_dir: '{{ app_home }}/dolphinscheduler'
@@ -80,3 +92,18 @@ activemq:
   home_dir: '{{ app_home }}/activemq'
   bind_ip: 0.0.0.0
   password: ctfo@123
+
+kafka:
+  home: /opt/kafka_2.12-2.8.2
+  port: 19092
+  data_dir: /mnt/data01/kafka2/logs
+  data_retention_hours: 720 # 30 days
+  zk:
+    port: 12181
+    data_dir: /mnt/data01/kafka2/zookeeper
+  cluster:
+    zk_prefix: 1
+    servers:
+      - 54.11.4.14
+      - 54.11.4.15
+      - 54.11.4.16

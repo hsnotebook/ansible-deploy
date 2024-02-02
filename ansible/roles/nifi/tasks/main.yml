@@ -1,3 +1,10 @@
+- name: setup dns
+  blockinfile:
+    insertafter: EOF
+    dest: /etc/hosts
+    state: present
+    content: '{{ nifi.cluster.dns }}'
+
 - name: setup maximum number of open file descriptors
   community.general.pam_limits:
     domain: root
@@ -38,6 +45,12 @@
   copy:
     src: jdbc/
     dest: '{{ nifi.home_dir }}/jdbc/'
+    force: false
+
+- name: copy orai18n drivers
+  copy:
+    src: jdbc/orai18n-19.20.0.0.jar
+    dest: '{{ nifi.home_dir }}/lib/orai18n-19.20.0.0.jar'
     force: false
 
 - name: Copy config files

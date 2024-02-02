@@ -1,0 +1,19 @@
+- name: Clean up
+  file:
+    path: '{{ nifi.ca.cert_dir }}'
+    state: absent
+
+- name: Create directory
+  file:
+    path: '{{ nifi.ca.cert_dir }}'
+    state: directory
+
+- name: Create jks
+  shell:
+    chdir: '{{ nifi.ca.cert_dir }}'
+    cmd: keytool -genkeypair -alias {{ cert.alias }} -keyalg RSA -keystore ./{{ cert.alias }}.jks -dname "{{ cert.dn }}" -storepass {{ nifi.ca.key_passwd }} -keypass {{ nifi.ca.key_passwd }}
+
+- name: create csr
+  shell:
+    chdir: '{{ nifi.ca.cert_dir }}'
+    cmd: keytool -certreq -alias {{ cert.alias }} -keystore ./{{ cert.alias }}.jks -storepass {{ nifi.ca.key_passwd }} -ext san={{ cert.san }} -file {{ cert.alias }}.csr

@@ -18,3 +18,4 @@ cd jdbc
 wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.1.0/mysql-connector-j-8.1.0.jar
 wget https://repo1.maven.org/maven2/org/postgresql/postgresql/42.6.0/postgresql-42.6.0.jar
 wget https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc10/19.20.0.0/ojdbc10-19.20.0.0.jar
+wget https://repo1.maven.org/maven2/com/oracle/database/nls/orai18n/19.20.0.0/orai18n-19.20.0.0.jar

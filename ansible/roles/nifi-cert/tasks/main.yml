@@ -1,0 +1,9 @@
+- name: copy sh script
+  copy:
+    src: keytool.sh
+    dest: /opt/lhasa/keytool.sh
+
+- name: execute script
+  shell:
+    chdir: /opt/lhasa
+    cmd: "./keytool.sh"

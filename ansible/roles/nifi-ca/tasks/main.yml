@@ -1,0 +1,37 @@
+- name: Clean up
+  file:
+    path: '{{ nifi.ca.rootca_dir }}'
+    state: absent
+
+- name: Prepare CA directory structure
+  file:
+    path: '{{ item.path }}'
+    state: '{{ item.state }}'
+  loop:
+    - { path: '{{ nifi.ca.rootca_dir }}/newcerts', state: directory }
+    - { path: '{{ nifi.ca.rootca_dir }}/certs', state: directory }
+    - { path: '{{ nifi.ca.rootca_dir }}/private', state: directory }
+    - { path: '{{ nifi.ca.rootca_dir }}/requests', state: directory }
+    - { path: '{{ nifi.ca.rootca_dir }}/index.txt', state: touch }
+
+- name: Create serial file
+  copy:
+    content: |
+      1234
+    dest: '{{ nifi.ca.rootca_dir }}/serial'
+
+- name: Copy openssl config file
+  template:
+    src: openssl.cnf.j2
+    dest: '{{ nifi.ca.rootca_dir }}/openssl.cnf'
+
+- name: Generate private key
+  shell:
+    chdir: '{{ nifi.ca.rootca_dir }}'
+    cmd: openssl genrsa -passout pass:{{ nifi.ca.key_passwd }} -des3 -out ./private/cakey.pem
+
+- name: Generate Self-Signed certificate
+  shell:
+    chdir: '{{ nifi.ca.rootca_dir }}'
+    cmd: openssl req -config ./openssl.cnf -passin pass:{{ nifi.ca.key_passwd }} -x509 -days 36500 -key ./private/cakey.pem -subj "{{ nifi.ca.dn }}" -out ./cacert.pem
+

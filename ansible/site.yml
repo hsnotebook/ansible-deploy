@@ -55,6 +55,7 @@
   hosts: nifi
   roles:
     - nifi
+    - nifi-cluster
   tags: nifi
 
 - name: install minio
