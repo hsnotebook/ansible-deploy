@@ -1,0 +1,6 @@
+zk:
+  id: 0
+cert:
+  alias: nifi-14
+  dn: CN=nifi-14,OU=Traffic Management,DC=ctfo,DC=com
+  san: ip:54.11.4.14

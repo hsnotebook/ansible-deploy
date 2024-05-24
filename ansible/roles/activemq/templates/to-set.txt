@@ -1,0 +1,9 @@
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+
+./conf/jetty-realm.properties admin password
+admin: ctfo@123, admin
+ctfo: ctfo@123, admin
+
+./conf/jetty.xml 127.0.0.1
+
+

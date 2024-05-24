@@ -1,0 +1,28 @@
+---
+- name: debug
+  hosts: all
+  tasks:
+    - name: lineinfile
+      lineinfile:
+        path: /opt/kafka_2.12-2.8.2/config/server.properties
+        regexp: 'offsets.topic.replication.factor=1'
+        line: 'offsets.topic.replication.factor=2'
+    - name: lineinfile
+      lineinfile:
+        path: /opt/kafka_2.12-2.8.2/config/server.properties
+        regexp: 'transaction.state.log.replication.factor=1'
+        line: 'transaction.state.log.replication.factor=2'
+    - name: lineinfile
+      lineinfile:
+        path: /opt/kafka_2.12-2.8.2/config/server.properties
+        regexp: 'transaction.state.log.min.isr=1'
+        line: 'transaction.state.log.min.isr=2'
+    - name: blockinfile
+      blockinfile:
+        path: /opt/kafka_2.12-2.8.2/config/server.properties
+        block: |
+          default.replication.factor=2
+    - name: restart
+      systemd:
+        name: kafka2
+        state: restarted

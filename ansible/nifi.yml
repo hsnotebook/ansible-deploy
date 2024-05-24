@@ -1,0 +1,22 @@
+---
+- name: config ca
+  hosts: ca
+  roles:
+    - nifi-ca
+  tags: ca
+- name: generate csr
+  hosts: all
+  roles:
+    - nifi-csr
+  tags: csr
+- name: sign cert
+  hosts: ca
+  roles:
+    - nifi-cert
+  tags: cert
+- name: install nifi
+  hosts: nifi
+  roles:
+    - nifi
+    - nifi-cluster
+  tags: nifi

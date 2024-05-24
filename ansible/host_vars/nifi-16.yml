@@ -1,0 +1,6 @@
+zk:
+  id: 2
+cert:
+  alias: nifi-16
+  dn: CN=nifi-16,OU=Traffic Management,DC=ctfo,DC=com
+  san: ip:54.11.4.16
